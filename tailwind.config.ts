@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				gem: {
+					DEFAULT: '#41ffef',
+					glow: '#41ffef80'
+				},
+				game: {
+					mines: '#ff4b4b',
+					blackjack: '#ffb800',
+					cases: '#be8aff'
 				}
 			},
 			borderRadius: {
@@ -84,11 +94,53 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				pulse: {
+					'0%, 100%': {
+						opacity: '1'
+					},
+					'50%': {
+						opacity: '0.5'
+					}
+				},
+				glow: {
+					'0%, 100%': {
+						boxShadow: '0 0 10px 2px var(--glow-color)',
+						transform: 'scale(1)'
+					},
+					'50%': {
+						boxShadow: '0 0 20px 4px var(--glow-color)',
+						transform: 'scale(1.03)'
+					}
+				},
+				float: {
+					'0%, 100%': {
+						transform: 'translateY(0)'
+					},
+					'50%': {
+						transform: 'translateY(-10px)'
+					}
+				},
+				rainFall: {
+					'0%': {
+						transform: 'translateY(-100vh)',
+						opacity: '0'
+					},
+					'10%': { opacity: '1' },
+					'90%': { opacity: '1' },
+					'100%': {
+						transform: 'translateY(100vh)',
+						opacity: '0'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				glow: 'glow 2s ease-in-out infinite',
+				float: 'float 3s ease-in-out infinite',
+				rainFall: 'rainFall 3s linear'
 			}
 		}
 	},

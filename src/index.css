@@ -1,88 +1,44 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 229 35% 8%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 229 30% 10%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 229 30% 10%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
+    --primary: 262 83% 76%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 217 33% 17%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 262 83% 76%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 50.6%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
+    --ring: 224.3 76.3% 48%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 229 38% 12%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 262 83% 76%;
+    --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
@@ -97,5 +53,70 @@
 
   body {
     @apply bg-background text-foreground;
+    background-image: radial-gradient(
+      circle at center,
+      rgba(74, 47, 147, 0.2) 0%,
+      rgba(0, 0, 0, 0) 70%
+    );
+    background-attachment: fixed;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/50 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+}
+
+@layer components {
+  .gem-text {
+    @apply text-gem font-bold;
+    text-shadow: 0 0 10px theme('colors.gem.glow');
+  }
+  
+  .gem-border {
+    @apply border-gem/70 shadow-[0_0_8px_theme(colors.gem.glow)];
+  }
+  
+  .game-card {
+    @apply relative overflow-hidden bg-card rounded-xl border border-border shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl;
+  }
+  
+  .btn-game {
+    @apply relative overflow-hidden px-6 py-3 rounded-lg text-white font-semibold transition-all duration-300 
+           before:absolute before:inset-0 before:w-full before:h-full before:bg-gradient-to-r before:opacity-0 
+           before:transition-opacity hover:before:opacity-100 hover:-translate-y-1 hover:shadow-lg;
+  }
+  
+  .btn-mines {
+    @apply bg-game-mines before:from-game-mines before:to-game-mines/50;
+    box-shadow: 0 0 15px rgba(255, 75, 75, 0.3);
+  }
+  
+  .btn-blackjack {
+    @apply bg-game-blackjack before:from-game-blackjack before:to-game-blackjack/50;
+    box-shadow: 0 0 15px rgba(255, 184, 0, 0.3);
+  }
+  
+  .btn-cases {
+    @apply bg-game-cases before:from-game-cases before:to-game-cases/50;
+    box-shadow: 0 0 15px rgba(190, 138, 255, 0.3);
+  }
+  
+  .rain-animation {
+    @apply fixed w-4 h-4 rounded-full bg-gem/70 animate-rainFall pointer-events-none;
+    animation-duration: calc(3s + (var(--random) * 2s));
+    left: calc(var(--random) * 100vw);
+    box-shadow: 0 0 10px theme('colors.gem.glow');
   }
 }
