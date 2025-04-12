@@ -1,11 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '@/context/UserContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { toast } from '@/components/ui/sonner';
-import { Bomb, Check, Gem, RefreshCw } from 'lucide-react';
+import { Bomb, Check, Gem, RefreshCw, Volume2, VolumeX } from 'lucide-react';
 
 const Mines: React.FC = () => {
   const { user, updateBalance } = useUser();
@@ -20,6 +20,39 @@ const Mines: React.FC = () => {
   const [nextCellMultiplier, setNextCellMultiplier] = useState(0);
   const [gameResult, setGameResult] = useState<'pending' | 'win' | 'lose'>('pending');
   const [canCashout, setCanCashout] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  // Audio references
+  const clickSound = useRef<HTMLAudioElement | null>(null);
+  const explosionSound = useRef<HTMLAudioElement | null>(null);
+  const gemSound = useRef<HTMLAudioElement | null>(null);
+  const cashoutSound = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize audio on component mount
+  useEffect(() => {
+    clickSound.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-plastic-bubble-click-1124.mp3');
+    explosionSound.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-sea-mine-explosion-1184.mp3');
+    gemSound.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3');
+    cashoutSound.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-coins-handling-1939.mp3');
+    
+    return () => {
+      // Clean up audio instances
+      [clickSound, explosionSound, gemSound, cashoutSound].forEach(sound => {
+        if (sound.current) {
+          sound.current.pause();
+          sound.current.currentTime = 0;
+        }
+      });
+    };
+  }, []);
+
+  // Play sound function with mute check
+  const playSound = (sound: React.RefObject<HTMLAudioElement>) => {
+    if (sound.current && !isMuted) {
+      sound.current.currentTime = 0;
+      sound.current.play().catch(e => console.log("Audio play error:", e));
+    }
+  };
 
   // Calculate multipliers based on mines count and revealed cells
   useEffect(() => {
@@ -61,6 +94,7 @@ const Mines: React.FC = () => {
     
     // Deduct bet amount
     updateBalance(-betAmount);
+    playSound(clickSound);
     
     // Generate mine positions
     const minePositions = new Set<number>();
@@ -83,6 +117,7 @@ const Mines: React.FC = () => {
   };
 
   const resetGame = () => {
+    playSound(clickSound);
     setIsGameActive(false);
     setGrid(
       Array(25).fill(null).map(() => ({ revealed: false, isMine: false, value: 0 }))
@@ -94,6 +129,8 @@ const Mines: React.FC = () => {
 
   const cashout = () => {
     if (!canCashout || !isGameActive) return;
+    
+    playSound(cashoutSound);
     
     // Reveal all mines
     setGrid(prev => prev.map(cell => ({
@@ -114,6 +151,8 @@ const Mines: React.FC = () => {
     
     if (grid[index].isMine) {
       // Hit a mine! Game over
+      playSound(explosionSound);
+      
       setGrid(prev => prev.map((cell, i) => ({
         ...cell,
         revealed: cell.revealed || cell.isMine || i === index
@@ -125,6 +164,8 @@ const Mines: React.FC = () => {
       
     } else {
       // Safe cell! Update the grid
+      playSound(gemSound);
+      
       setGrid(prev => prev.map((cell, i) => ({
         ...cell,
         revealed: cell.revealed || i === index,
@@ -143,12 +184,25 @@ const Mines: React.FC = () => {
     }
   };
 
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
   return (
     <div className="container py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-center relative">
           <h1 className="text-3xl font-bold">Mines</h1>
           <p className="text-muted-foreground">Avoid mines and win big! The longer you play, the higher the risk and reward.</p>
+          
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="absolute right-0 top-0"
+            onClick={toggleMute}
+          >
+            {isMuted ? <VolumeX /> : <Volume2 />}
+          </Button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -306,6 +360,20 @@ const Mines: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Hidden audio elements */}
+      <audio ref={clickSound} preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-plastic-bubble-click-1124.mp3" type="audio/mpeg" />
+      </audio>
+      <audio ref={explosionSound} preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-sea-mine-explosion-1184.mp3" type="audio/mpeg" />
+      </audio>
+      <audio ref={gemSound} preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg" />
+      </audio>
+      <audio ref={cashoutSound} preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-coins-handling-1939.mp3" type="audio/mpeg" />
+      </audio>
     </div>
   );
 };

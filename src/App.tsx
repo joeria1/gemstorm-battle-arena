@@ -6,12 +6,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 import { RainProvider } from "./context/RainContext";
+import { SoundProvider } from "./components/SoundManager";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import RainTimer from "./components/RainTimer";
 import RainAnimation from "./components/RainAnimation";
 import Index from "./pages/Index";
 import CaseBattles from "./pages/CaseBattles";
+import CaseOpeningPage from "./pages/CaseOpeningPage";
 import Mines from "./pages/Mines";
 import Blackjack from "./pages/Blackjack";
 import NotFound from "./pages/NotFound";
@@ -39,6 +41,7 @@ const AppContent = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/cases" element={<CaseBattles />} />
+          <Route path="/case-opening" element={<CaseOpeningPage />} />
           <Route path="/mines" element={<Mines />} />
           <Route path="/blackjack" element={<Blackjack />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -56,13 +59,15 @@ const App = () => (
     <TooltipProvider>
       <UserProvider>
         <RainProvider>
-          <BrowserRouter>
-            <RainWrapper>
-              <AppContent />
-            </RainWrapper>
-          </BrowserRouter>
-          <Toaster />
-          <Sonner />
+          <SoundProvider>
+            <BrowserRouter>
+              <RainWrapper>
+                <AppContent />
+              </RainWrapper>
+            </BrowserRouter>
+            <Toaster />
+            <Sonner />
+          </SoundProvider>
         </RainProvider>
       </UserProvider>
     </TooltipProvider>

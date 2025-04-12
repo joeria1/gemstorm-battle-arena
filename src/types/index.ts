@@ -26,6 +26,15 @@ export interface CaseBattle {
   status: 'waiting' | 'in-progress' | 'completed';
   caseType?: number;
   creator?: string;
+  items?: CaseBattleItem[];
+}
+
+export interface CaseBattleItem {
+  name: string;
+  rarity: string;
+  value: number;
+  image: string;
+  color: string;
 }
 
 export interface MinesGame {

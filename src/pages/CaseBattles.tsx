@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,12 +28,10 @@ const caseTypes = [
 ];
 
 const CaseBattles: React.FC = () => {
+  const navigate = useNavigate();
   const { user, updateBalance } = useUser();
   const [battles, setBattles] = useState<CaseBattle[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [showBattleAnimation, setShowBattleAnimation] = useState(false);
-  const [animatingBattle, setAnimatingBattle] = useState<CaseBattle | null>(null);
-  const [animationResult, setAnimationResult] = useState<{won: boolean, amount: number} | null>(null);
   const [newBattle, setNewBattle] = useState({
     name: '',
     price: 100,
@@ -167,39 +165,9 @@ const CaseBattles: React.FC = () => {
     if (battle.currentPlayers + 1 >= battle.maxPlayers) {
       // Battle is full, start it
       toast.success('Battle starting!');
-      setAnimatingBattle(battle);
-      setShowBattleAnimation(true);
       
-      // Simulate battle results after animation time
-      setTimeout(() => {
-        // Simulate battle results
-        const randomWinner = Math.random() > 0.5;
-        const winAmount = battle.price * battle.maxPlayers * 0.9; // 10% fee
-        
-        setAnimationResult({
-          won: randomWinner,
-          amount: randomWinner ? winAmount : 0
-        });
-        
-        setTimeout(() => {
-          if (randomWinner) {
-            updateBalance(winAmount);
-            toast.success(`You won ${winAmount} gems!`);
-          } else {
-            toast('Better luck next time!');
-          }
-          
-          // Remove the battle after animation finishes
-          setTimeout(() => {
-            setShowBattleAnimation(false);
-            setAnimatingBattle(null);
-            setAnimationResult(null);
-            
-            // Remove the battle
-            setBattles(prev => prev.filter(b => b.id !== battleId));
-          }, 2000);
-        }, 3000);
-      }, 3000);
+      // Navigate to the case opening page with battle info
+      navigate('/case-opening', { state: { battle } });
     } else {
       toast.success('You have joined the battle');
     }
@@ -245,44 +213,6 @@ const CaseBattles: React.FC = () => {
         </TabsList>
         
         <TabsContent value="all" className="space-y-6">
-          {showBattleAnimation && animatingBattle && (
-            <div className="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold mb-2">Battle in Progress!</h2>
-                <p className="text-lg mb-4">{animatingBattle.name}</p>
-                <div className="flex justify-center gap-8 mb-8">
-                  {Array(animatingBattle.casesToOpen).fill(0).map((_, i) => (
-                    <div key={i} className={`animate-bounce ${i % 2 === 0 ? 'animate-delay-100' : 'animate-delay-300'}`} style={{ animationDelay: `${i * 200}ms` }}>
-                      {renderCaseImage(animatingBattle.caseType)}
-                    </div>
-                  ))}
-                </div>
-                
-                {animationResult && (
-                  <div className={`mt-8 p-6 rounded-xl animate-scale-in ${animationResult.won ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
-                    <h3 className="text-xl font-bold mb-2">
-                      {animationResult.won ? 'You Won!' : 'Better Luck Next Time!'}
-                    </h3>
-                    {animationResult.won && (
-                      <div className="flex items-center justify-center gap-2">
-                        <Gem className="h-5 w-5 text-gem animate-pulse" />
-                        <span className="text-2xl font-bold text-gem">{animationResult.amount}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              
-              <Button 
-                onClick={() => setShowBattleAnimation(false)}
-                variant="outline"
-                className="mt-4"
-              >
-                Skip Animation
-              </Button>
-            </div>
-          )}
-        
           {battles.length > 0 ? (
             battles.map(battle => (
               <div key={battle.id} className="bg-card rounded-lg border border-border overflow-hidden">
