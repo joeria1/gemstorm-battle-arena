@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/sonner';
-import { Card, ChevronsDown, ChevronsUp, Gem, Play, RefreshCw } from 'lucide-react';
+import { CreditCard, ChevronsDown, ChevronsUp, Gem, Play, RefreshCw } from 'lucide-react';
 
 // Card suits: spades (♠), hearts (♥), diamonds (♦), clubs (♣)
 const suits = ['♠', '♥', '♦', '♣'];
@@ -429,7 +428,7 @@ const Blackjack: React.FC = () => {
                   ))}
                   {dealerHand.length === 0 && gameState === 'betting' && (
                     <div className="flex items-center justify-center border-2 border-dashed border-white/20 rounded-md w-16 h-24">
-                      <Card className="text-white/30" />
+                      <CreditCard className="text-white/30" />
                     </div>
                   )}
                 </div>
@@ -454,7 +453,7 @@ const Blackjack: React.FC = () => {
                   ))}
                   {playerHand.length === 0 && gameState === 'betting' && (
                     <div className="flex items-center justify-center border-2 border-dashed border-white/20 rounded-md w-16 h-24">
-                      <Card className="text-white/30" />
+                      <CreditCard className="text-white/30" />
                     </div>
                   )}
                 </div>
