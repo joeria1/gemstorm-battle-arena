@@ -269,17 +269,17 @@ const Mines: React.FC = () => {
                     aspect-square rounded-lg transition-all duration-200
                     ${!isGameActive && !cell.revealed ? 'bg-card hover:bg-card/80 cursor-not-allowed' : ''}
                     ${isGameActive && !cell.revealed ? 'bg-card hover:bg-primary/20 hover:shadow-md cursor-pointer' : ''}
-                    ${cell.revealed && cell.isMine ? 'bg-destructive text-destructive-foreground' : ''}
-                    ${cell.revealed && !cell.isMine ? 'bg-primary/20 gem-border' : ''}
+                    ${cell.revealed && cell.isMine ? 'bg-destructive text-destructive-foreground animate-shake' : ''}
+                    ${cell.revealed && !cell.isMine ? 'bg-primary/20 gem-border animate-reveal' : ''}
                     border border-border flex items-center justify-center
                   `}
                   onClick={() => handleCellClick(index)}
                   disabled={!isGameActive || cell.revealed}
                 >
                   {cell.revealed && cell.isMine ? (
-                    <Bomb className="h-6 w-6" />
+                    <Bomb className="h-6 w-6 animate-bounce" />
                   ) : cell.revealed && !cell.isMine ? (
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center animate-scale-in">
                       <Gem className="h-4 w-4 text-gem mb-0.5" />
                       <span className="text-xs font-bold gem-text">{cell.value.toFixed(2)}x</span>
                     </div>
@@ -291,14 +291,14 @@ const Mines: React.FC = () => {
             </div>
             
             {gameResult === 'lose' && (
-              <div className="mt-4 bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
+              <div className="mt-4 bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center animate-fade-in">
                 <h3 className="font-semibold text-lg">You Hit a Mine!</h3>
                 <p className="text-muted-foreground">Better luck next time. Try again with a new game!</p>
               </div>
             )}
             
             {gameResult === 'win' && (
-              <div className="mt-4 bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center">
+              <div className="mt-4 bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center animate-fade-in">
                 <h3 className="font-semibold text-lg">You Won!</h3>
                 <p className="text-muted-foreground">Congratulations! You've cashed out with {potentialWin} gems.</p>
               </div>

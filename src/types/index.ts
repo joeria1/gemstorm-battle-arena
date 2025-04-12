@@ -24,6 +24,8 @@ export interface CaseBattle {
   maxPlayers: number;
   currentPlayers: number;
   status: 'waiting' | 'in-progress' | 'completed';
+  caseType?: number;
+  creator?: string;
 }
 
 export interface MinesGame {

@@ -3,21 +3,43 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
 import { CaseBattle } from '@/types';
 import { useUser } from '@/context/UserContext';
-import { Plus, Users, Timer, Gem } from 'lucide-react';
+import { Plus, Users, Timer, Gem, Package, Trophy, Star, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from '@/components/ui/sonner';
+
+// Case Battle Images
+const caseImages = [
+  '/case-blue.png',
+  '/case-red.png',
+  '/case-green.png',
+  '/case-purple.png',
+  '/case-gold.png'
+];
+
+// Case Battle Types
+const caseTypes = [
+  { name: 'Basic', color: 'bg-blue-500', icon: <Package /> },
+  { name: 'Premium', color: 'bg-purple-500', icon: <Star /> },
+  { name: 'Elite', color: 'bg-red-500', icon: <Trophy /> },
+  { name: 'Ultimate', color: 'bg-amber-500', icon: <Sparkles /> }
+];
 
 const CaseBattles: React.FC = () => {
   const { user, updateBalance } = useUser();
   const [battles, setBattles] = useState<CaseBattle[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [showBattleAnimation, setShowBattleAnimation] = useState(false);
+  const [animatingBattle, setAnimatingBattle] = useState<CaseBattle | null>(null);
+  const [animationResult, setAnimationResult] = useState<{won: boolean, amount: number} | null>(null);
   const [newBattle, setNewBattle] = useState({
     name: '',
     price: 100,
     casesToOpen: 3,
-    maxPlayers: 2
+    maxPlayers: 2,
+    caseType: 0
   });
 
   useEffect(() => {
@@ -30,7 +52,9 @@ const CaseBattles: React.FC = () => {
         casesToOpen: 5,
         maxPlayers: 2,
         currentPlayers: 0,
-        status: 'waiting'
+        status: 'waiting',
+        caseType: 1,
+        creator: 'Player123'
       },
       {
         id: '2',
@@ -39,7 +63,9 @@ const CaseBattles: React.FC = () => {
         casesToOpen: 3,
         maxPlayers: 4,
         currentPlayers: 2,
-        status: 'waiting'
+        status: 'waiting',
+        caseType: 3,
+        creator: 'VIPGamer'
       },
       {
         id: '3',
@@ -48,7 +74,9 @@ const CaseBattles: React.FC = () => {
         casesToOpen: 2,
         maxPlayers: 2,
         currentPlayers: 1,
-        status: 'waiting'
+        status: 'waiting',
+        caseType: 0,
+        creator: 'Newbie42'
       },
       {
         id: '4',
@@ -57,7 +85,9 @@ const CaseBattles: React.FC = () => {
         casesToOpen: 4,
         maxPlayers: 3,
         currentPlayers: 0,
-        status: 'waiting'
+        status: 'waiting',
+        caseType: 2,
+        creator: 'ProHunter'
       }
     ];
     
@@ -87,7 +117,9 @@ const CaseBattles: React.FC = () => {
       casesToOpen: newBattle.casesToOpen,
       maxPlayers: newBattle.maxPlayers,
       currentPlayers: 1,
-      status: 'waiting'
+      status: 'waiting',
+      caseType: newBattle.caseType,
+      creator: user.username
     };
     
     setBattles(prev => [battle, ...prev]);
@@ -98,7 +130,8 @@ const CaseBattles: React.FC = () => {
       name: '',
       price: 100,
       casesToOpen: 3,
-      maxPlayers: 2
+      maxPlayers: 2,
+      caseType: 0
     });
     
     toast.success('Battle created successfully!');
@@ -134,23 +167,58 @@ const CaseBattles: React.FC = () => {
     if (battle.currentPlayers + 1 >= battle.maxPlayers) {
       // Battle is full, start it
       toast.success('Battle starting!');
+      setAnimatingBattle(battle);
+      setShowBattleAnimation(true);
+      
+      // Simulate battle results after animation time
       setTimeout(() => {
-        // Simulate battle results after 2 seconds
+        // Simulate battle results
         const randomWinner = Math.random() > 0.5;
-        if (randomWinner) {
-          const winAmount = battle.price * battle.maxPlayers * 0.9; // 10% fee
-          updateBalance(winAmount);
-          toast.success(`You won ${winAmount} gems!`);
-        } else {
-          toast('Better luck next time!');
-        }
+        const winAmount = battle.price * battle.maxPlayers * 0.9; // 10% fee
         
-        // Remove the battle
-        setBattles(prev => prev.filter(b => b.id !== battleId));
-      }, 2000);
+        setAnimationResult({
+          won: randomWinner,
+          amount: randomWinner ? winAmount : 0
+        });
+        
+        setTimeout(() => {
+          if (randomWinner) {
+            updateBalance(winAmount);
+            toast.success(`You won ${winAmount} gems!`);
+          } else {
+            toast('Better luck next time!');
+          }
+          
+          // Remove the battle after animation finishes
+          setTimeout(() => {
+            setShowBattleAnimation(false);
+            setAnimatingBattle(null);
+            setAnimationResult(null);
+            
+            // Remove the battle
+            setBattles(prev => prev.filter(b => b.id !== battleId));
+          }, 2000);
+        }, 3000);
+      }, 3000);
     } else {
       toast.success('You have joined the battle');
     }
+  };
+
+  const renderCaseImage = (caseType: number) => {
+    const type = caseTypes[caseType % caseTypes.length];
+    return (
+      <div className={`relative flex items-center justify-center ${type.color} bg-opacity-20 p-4 rounded-lg border-2 border-opacity-50`}>
+        <div className="absolute top-2 right-2">
+          {type.icon}
+        </div>
+        <img 
+          src={`https://picsum.photos/seed/case${caseType}/200/200`}
+          alt="Case"
+          className="w-16 h-16 object-contain filter drop-shadow-lg"
+        />
+      </div>
+    );
   };
 
   return (
@@ -177,66 +245,161 @@ const CaseBattles: React.FC = () => {
         </TabsList>
         
         <TabsContent value="all" className="space-y-6">
+          {showBattleAnimation && animatingBattle && (
+            <div className="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold mb-2">Battle in Progress!</h2>
+                <p className="text-lg mb-4">{animatingBattle.name}</p>
+                <div className="flex justify-center gap-8 mb-8">
+                  {Array(animatingBattle.casesToOpen).fill(0).map((_, i) => (
+                    <div key={i} className={`animate-bounce ${i % 2 === 0 ? 'animate-delay-100' : 'animate-delay-300'}`} style={{ animationDelay: `${i * 200}ms` }}>
+                      {renderCaseImage(animatingBattle.caseType)}
+                    </div>
+                  ))}
+                </div>
+                
+                {animationResult && (
+                  <div className={`mt-8 p-6 rounded-xl animate-scale-in ${animationResult.won ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
+                    <h3 className="text-xl font-bold mb-2">
+                      {animationResult.won ? 'You Won!' : 'Better Luck Next Time!'}
+                    </h3>
+                    {animationResult.won && (
+                      <div className="flex items-center justify-center gap-2">
+                        <Gem className="h-5 w-5 text-gem animate-pulse" />
+                        <span className="text-2xl font-bold text-gem">{animationResult.amount}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              <Button 
+                onClick={() => setShowBattleAnimation(false)}
+                variant="outline"
+                className="mt-4"
+              >
+                Skip Animation
+              </Button>
+            </div>
+          )}
+        
           {battles.length > 0 ? (
             battles.map(battle => (
-              <div key={battle.id} className="bg-card rounded-lg border border-border p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{battle.name}</h3>
-                  <div className="flex items-center gap-4 mt-2">
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <div key={battle.id} className="bg-card rounded-lg border border-border overflow-hidden">
+                <div className="bg-gradient-to-r from-transparent to-primary/5 p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      {renderCaseImage(battle.caseType)}
+                      <div>
+                        <h3 className="font-semibold text-lg">{battle.name}</h3>
+                        <p className="text-xs text-muted-foreground">Created by {battle.creator}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap items-center gap-4 mt-4">
+                      <div className="flex items-center gap-1 text-sm">
+                        <Gem className="h-4 w-4 text-gem" />
+                        <span>{battle.price} per player</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm">
+                        <Timer className="h-4 w-4" />
+                        <span>{battle.casesToOpen} cases</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm">
+                        <Users className="h-4 w-4" />
+                        <span>{battle.currentPlayers}/{battle.maxPlayers}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-shrink-0 bg-card p-3 rounded-lg self-start md:self-center shadow-md">
+                    <div className="text-center mb-2 text-xs font-medium">Total Prize</div>
+                    <div className="flex items-center justify-center gap-1.5">
                       <Gem className="h-4 w-4 text-gem" />
-                      <span>{battle.price} per player</span>
+                      <span className="text-lg font-bold text-gem">{battle.price * battle.maxPlayers * 0.9}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Timer className="h-4 w-4" />
-                      <span>{battle.casesToOpen} cases</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4" />
-                      <span>{battle.currentPlayers}/{battle.maxPlayers}</span>
-                    </div>
+                    
+                    <Button 
+                      onClick={() => joinBattle(battle.id)}
+                      disabled={!user || battle.currentPlayers >= battle.maxPlayers}
+                      className="bg-game-cases hover:bg-game-cases/90 w-full mt-3"
+                      size="sm"
+                    >
+                      Join Battle
+                    </Button>
                   </div>
                 </div>
                 
-                <div className="flex-shrink-0">
-                  <Button 
-                    onClick={() => joinBattle(battle.id)}
-                    disabled={!user || battle.currentPlayers >= battle.maxPlayers}
-                    className="bg-game-cases hover:bg-game-cases/90"
-                  >
-                    Join Battle
-                  </Button>
+                <div className="p-3 bg-primary/5 flex justify-between items-center">
+                  <div className="flex gap-2">
+                    {Array(battle.maxPlayers).fill(0).map((_, i) => (
+                      <div 
+                        key={i} 
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border ${
+                          i < battle.currentPlayers ? 'bg-primary/20 border-primary' : 'bg-muted border-border'
+                        }`}
+                      >
+                        {i < battle.currentPlayers ? (i === 0 ? battle.creator.substring(0, 1) : 'P') : ''}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    battle.status === 'waiting' ? 'bg-amber-500/20 text-amber-500' : 
+                    battle.status === 'in-progress' ? 'bg-blue-500/20 text-blue-500' : 
+                    'bg-green-500/20 text-green-500'
+                  }`}>
+                    {battle.status === 'waiting' ? 'Waiting' : 
+                     battle.status === 'in-progress' ? 'In Progress' : 'Completed'}
+                  </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground">No active battles. Create one!</p>
-            </div>
+            <Card className="border-dashed animate-pulse">
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <Package className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">No active battles. Create one!</p>
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
         
         <TabsContent value="mine">
-          <div className="text-center py-16">
-            <p className="text-muted-foreground">You haven't created any battles yet.</p>
-          </div>
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Package className="h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">You haven't created any battles yet.</p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => setIsCreateDialogOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Create Battle
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
         
         <TabsContent value="high">
-          <div className="text-center py-16">
-            <p className="text-muted-foreground">No high stakes battles available at the moment.</p>
-          </div>
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Trophy className="h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No high stakes battles available at the moment.</p>
+              <p className="text-xs text-muted-foreground mt-1">High stakes battles have minimum bets of 1000 gems</p>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
       
       {/* Create Battle Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Create New Battle</DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4">
+          <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Battle Name</label>
               <Input
@@ -244,6 +407,23 @@ const CaseBattles: React.FC = () => {
                 onChange={(e) => setNewBattle({...newBattle, name: e.target.value})}
                 placeholder="Enter battle name"
               />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Case Type</label>
+              <div className="grid grid-cols-4 gap-2">
+                {caseTypes.map((type, index) => (
+                  <Button
+                    key={index}
+                    variant={newBattle.caseType === index ? "default" : "outline"}
+                    className={`flex flex-col h-auto p-2 ${newBattle.caseType === index ? type.color : ''}`}
+                    onClick={() => setNewBattle({...newBattle, caseType: index})}
+                  >
+                    {type.icon}
+                    <span className="text-xs mt-1">{type.name}</span>
+                  </Button>
+                ))}
+              </div>
             </div>
             
             <div className="space-y-2">
@@ -277,12 +457,25 @@ const CaseBattles: React.FC = () => {
                 max={4}
               />
             </div>
+            
+            <div className="bg-muted p-4 rounded-lg mt-4">
+              <div className="text-sm font-medium mb-2">Preview</div>
+              <div className="flex items-center gap-3">
+                {renderCaseImage(newBattle.caseType)}
+                <div>
+                  <p className="font-medium">{newBattle.name || "Your Battle"}</p>
+                  <div className="text-xs text-muted-foreground">
+                    {newBattle.casesToOpen} cases • {newBattle.maxPlayers} players
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
           <DialogFooter>
             <Button 
               onClick={handleCreateBattle}
-              className="bg-game-cases hover:bg-game-cases/90"
+              className="bg-game-cases hover:bg-game-cases/90 w-full"
               disabled={!user || user.balance < newBattle.price}
             >
               Create Battle

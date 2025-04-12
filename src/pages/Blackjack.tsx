@@ -268,6 +268,7 @@ const Blackjack: React.FC = () => {
       <div className={`
         relative w-16 h-24 rounded-md flex items-center justify-center
         ${isHidden ? 'bg-primary/20 border-2 border-primary/30' : 'bg-white'} shadow-md
+        ${isHidden ? '' : 'animate-flip'}
       `}>
         {!isHidden ? (
           <div className="flex flex-col items-center">
