@@ -83,7 +83,7 @@ const Blackjack: React.FC = () => {
   // Draw card from the deck
   const drawCard = (): PlayingCard => {
     const card = deck[0];
-    setDeck(deck.slice(1));
+    setDeck(prev => prev.slice(1));
     return card;
   };
 
@@ -331,7 +331,7 @@ const Blackjack: React.FC = () => {
                 
                 <Button 
                   onClick={startGame}
-                  disabled={!user || user.balance < betAmount}
+                  disabled={!user || user?.balance < betAmount}
                   className="w-full bg-game-blackjack hover:bg-game-blackjack/90"
                 >
                   <Play className="mr-2 h-4 w-4" /> Deal Cards
@@ -422,7 +422,7 @@ const Blackjack: React.FC = () => {
                 
                 <div className="flex gap-2">
                   {dealerHand.map((card, index) => (
-                    <div key={index} className="animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+                    <div key={`dealer-${index}-${card.suit}-${card.value}`} className="animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
                       {renderCard(card, index === 1 && gameState === 'playing')}
                     </div>
                   ))}
@@ -447,7 +447,7 @@ const Blackjack: React.FC = () => {
                 
                 <div className="flex flex-wrap gap-2">
                   {playerHand.map((card, index) => (
-                    <div key={index} className="animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+                    <div key={`player-${index}-${card.suit}-${card.value}`} className="animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
                       {renderCard(card)}
                     </div>
                   ))}

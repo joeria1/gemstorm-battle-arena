@@ -228,7 +228,7 @@ const Mines: React.FC = () => {
                     </span>
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    Next: {(nextCellMultiplier * betAmount).toFixed(0)} gems
+                    Next: {Math.floor(nextCellMultiplier * betAmount)} gems
                   </div>
                 </div>
                 
@@ -251,7 +251,7 @@ const Mines: React.FC = () => {
             ) : (
               <Button 
                 onClick={startGame}
-                disabled={!user || user.balance < betAmount}
+                disabled={!user || user?.balance < betAmount}
                 className="w-full bg-game-mines hover:bg-game-mines/90"
               >
                 Start Game
