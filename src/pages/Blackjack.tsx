@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import { Button } from '@/components/ui/button';
@@ -108,7 +109,6 @@ const Blackjack: React.FC = () => {
     
     // Create a fresh deck
     const newDeck = createDeck();
-    setDeck(newDeck);
     
     // Draw initial cards
     const playerCard1 = newDeck[0];

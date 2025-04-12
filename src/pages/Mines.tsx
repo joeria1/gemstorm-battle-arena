@@ -268,7 +268,7 @@ const Mines: React.FC = () => {
                   className={`
                     aspect-square rounded-lg transition-all duration-200
                     ${!isGameActive && !cell.revealed ? 'bg-card hover:bg-card/80 cursor-not-allowed' : ''}
-                    ${isGameActive && !cell.revealed ? 'bg-card hover:bg-primary/20 hover:shadow-md' : ''}
+                    ${isGameActive && !cell.revealed ? 'bg-card hover:bg-primary/20 hover:shadow-md cursor-pointer' : ''}
                     ${cell.revealed && cell.isMine ? 'bg-destructive text-destructive-foreground' : ''}
                     ${cell.revealed && !cell.isMine ? 'bg-primary/20 gem-border' : ''}
                     border border-border flex items-center justify-center
